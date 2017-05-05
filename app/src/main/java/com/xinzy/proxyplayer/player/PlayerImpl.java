@@ -1,5 +1,7 @@
 package com.xinzy.proxyplayer.player;
 
+import android.content.Context;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.util.Log;
 
@@ -22,10 +24,44 @@ public class PlayerImpl implements Player, InternalMediaPlayer.PlayerCallback
 
     private InternalMediaPlayer.PlayerCallback mCallback;
 
-    public PlayerImpl()
+    private AudioManager mAudioManager;
+
+    private AudioManager.OnAudioFocusChangeListener mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
+
+        private boolean mPausedByTransientLossOfFocus = false;
+        @Override
+        public void onAudioFocusChange(int focusChange)
+        {
+            switch(focusChange){
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    if(mMediaPlayer.getStatus() == PlayerStatus.Playing){
+                        mPausedByTransientLossOfFocus = false;
+                        pause();
+                    }
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    if(mMediaPlayer.getStatus() == PlayerStatus.Playing){
+                        mPausedByTransientLossOfFocus = true;
+                        pause();
+                    }
+                    break;
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    if(mMediaPlayer.getStatus() != PlayerStatus.Playing && mPausedByTransientLossOfFocus){
+                        mPausedByTransientLossOfFocus = false;
+                        resume();
+                    }
+                    break;
+            }
+        }
+    };
+
+    public PlayerImpl(Context context)
     {
         mMediaPlayer = new InternalMediaPlayer();
         mMediaPlayer.setCallback(this);
+
+        mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
     }
 
     @Override
@@ -50,6 +86,8 @@ public class PlayerImpl implements Player, InternalMediaPlayer.PlayerCallback
         {
             mMediaPlayer.setDataSource(Server.getAddress(port));
             mMediaPlayer.prepareAsync();
+
+            mAudioManager.requestAudioFocus(mAudioFocusListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -64,6 +102,15 @@ public class PlayerImpl implements Player, InternalMediaPlayer.PlayerCallback
         if (mServer != null)
         {
             mServer.stopServer();
+        }
+    }
+
+    @Override
+    public void resume()
+    {
+        if (mMediaPlayer.getStatus() == PlayerStatus.Pause)
+        {
+            mMediaPlayer.start();
         }
     }
 
@@ -97,6 +144,7 @@ public class PlayerImpl implements Player, InternalMediaPlayer.PlayerCallback
     public void release()
     {
         mMediaPlayer.release();
+        mAudioManager.abandonAudioFocus(mAudioFocusListener);
     }
 
     @Override

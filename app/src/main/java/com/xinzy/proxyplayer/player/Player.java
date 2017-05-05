@@ -13,6 +13,8 @@ public interface Player
 
     void stop();
 
+    void resume();
+
     void pause();
 
     void seekTo(int msec);

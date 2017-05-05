@@ -1,7 +1,5 @@
 package com.xinzy.proxyplayer.server;
 
-import android.util.Log;
-
 import org.nanohttpd.protocols.http.IHTTPSession;
 import org.nanohttpd.protocols.http.NanoHTTPD;
 import org.nanohttpd.protocols.http.response.Response;
@@ -49,16 +47,15 @@ public class LocalServer extends Server
             raf.seek(startPosition);
 
             Response response = Response.newChunkedResponse(Status.OK, NanoHTTPD.getMimeTypeForFile(mUri), fis);
-            String contentRange = String.format("byte %1$d-%2$d/%3$d", startPosition, contentLength, contentLength - startPosition);
+            String contentRange = String.format(CONTENT_RANGE_FORMAT, startPosition, contentLength, contentLength - startPosition);
             response.addHeader("Content-Range", contentRange);
 
             return response;
         } catch (IOException e)
         {
-            Log.e(TAG, "serve: ", e);
+            e(TAG, "serve: ", e);
         }
 
         return super.serve(session);
     }
-
 }

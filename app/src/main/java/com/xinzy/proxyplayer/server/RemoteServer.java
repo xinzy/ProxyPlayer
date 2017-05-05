@@ -1,7 +1,5 @@
 package com.xinzy.proxyplayer.server;
 
-import android.util.Log;
-
 import org.nanohttpd.protocols.http.IHTTPSession;
 import org.nanohttpd.protocols.http.response.Response;
 import org.nanohttpd.protocols.http.response.Status;
@@ -20,8 +18,6 @@ import okhttp3.Request;
 public class RemoteServer extends Server
 {
     private static final String TAG = "RemoteServer";
-
-    public static final String CONTENT_RANGE_FORMAT = "byte %d-%d/%d";
 
     private OkHttpClient mClient;
 
@@ -57,6 +53,8 @@ public class RemoteServer extends Server
             {
                 startPosition = 0;
             }
+            i(TAG, "contentLength = " + contentLength + "; startPosition = " + startPosition);
+
             Request.Builder requestBuilder = new Request.Builder().url(mUri).get();
             String range;
             if (startPosition > 0)
@@ -77,11 +75,10 @@ public class RemoteServer extends Server
 
             Response sendResponse = Response.newChunkedResponse(Status.OK, contentType, response.body().byteStream());
             sendResponse.addHeader("Content-Range", range);
-
             return sendResponse;
         } catch (IOException e)
         {
-            Log.e(TAG, "serve: ", e);
+            e(TAG, "serve: ", e);
             return super.serve(session);
         }
     }

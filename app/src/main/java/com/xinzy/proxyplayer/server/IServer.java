@@ -6,6 +6,7 @@ package com.xinzy.proxyplayer.server;
 
 public interface IServer
 {
+    boolean DEBUG = true;
 
     void stopServer();
 

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -31,8 +30,6 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     private SeekBar mSeekBar;
     private TextView mCurrentTimeText;
     private TextView mTotalTimeText;
-    private Button mLocalBtn;
-    private Button mRemoteBtn;
 
     private Player mPlayer;
 
@@ -45,16 +42,23 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         mSeekBar = (SeekBar) findViewById(R.id.seekBar);
         mCurrentTimeText = (TextView) findViewById(R.id.currentTime);
         mTotalTimeText = (TextView) findViewById(R.id.totalTime);
-        mLocalBtn = (Button) findViewById(R.id.local);
-        mRemoteBtn = (Button) findViewById(R.id.remote);
 
         mSeekBar.setOnSeekBarChangeListener(this);
-        mLocalBtn.setOnClickListener(this);
-        mRemoteBtn.setOnClickListener(this);
-        mPlayer = new PlayerImpl();
+        mPlayer = new PlayerImpl(getApplicationContext());
         mPlayer.setPlayerCallback(this);
 
+        findViewById(R.id.local).setOnClickListener(this);
+        findViewById(R.id.remote).setOnClickListener(this);
+        findViewById(R.id.stop).setOnClickListener(this);
         findViewById(R.id.testLocal).setOnClickListener(this);
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        mPlayer.stop();
+        mPlayer.release();
     }
 
     @Override
@@ -63,30 +67,41 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         switch (v.getId())
         {
             case R.id.local:
-                mPlayer.reset();
-                if (mPlayer.getStatus() == Player.PlayerStatus.Playing)
+                if (! handlerPlayer())
                 {
-                    mPlayer.stop();
-                } else
-                {
+                    mPlayer.reset();
                     mPlayer.start(Uri.parse(PATH));
                 }
                 break;
             case R.id.remote:
-                mPlayer.reset();
-                if (mPlayer.getStatus() == Player.PlayerStatus.Playing)
+                if (! handlerPlayer())
                 {
-                    mPlayer.stop();
-                } else
-                {
+                    mPlayer.reset();
                     mPlayer.start(Uri.parse(URL));
                 }
                 break;
-
+            case R.id.stop:
+                mPlayer.stop();
+                break;
             case R.id.testLocal:
                 testServer();
                 break;
         }
+    }
+
+    private boolean handlerPlayer()
+    {
+        final Player.PlayerStatus status = mPlayer.getStatus();
+        if (status == Player.PlayerStatus.Playing)
+        {
+            mPlayer.pause();
+            return true;
+        } else if (status == Player.PlayerStatus.Pause)
+        {
+            mPlayer.resume();
+            return true;
+        }
+        return false;
     }
 
     @Override

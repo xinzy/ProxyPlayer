@@ -54,6 +54,12 @@
             android:layout_height="wrap_content"
             android:text="远程"/>
 
+        <Button
+            android:id="@+id/stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="停止"/>
+
     </LinearLayout>
 
     <LinearLayout
