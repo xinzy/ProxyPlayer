@@ -1,4 +1,4 @@
-package com.xinzy.proxyplayer.player.server;
+package com.xinzy.proxyplayer.server;
 
 /**
  * Created by Xinzy on 2017-05-05.

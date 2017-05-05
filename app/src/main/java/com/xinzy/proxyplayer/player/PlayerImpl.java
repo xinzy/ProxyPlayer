@@ -3,9 +3,9 @@ package com.xinzy.proxyplayer.player;
 import android.net.Uri;
 import android.util.Log;
 
-import com.xinzy.proxyplayer.player.server.LocalServer;
-import com.xinzy.proxyplayer.player.server.RemoteServer;
-import com.xinzy.proxyplayer.player.server.Server;
+import com.xinzy.proxyplayer.server.LocalServer;
+import com.xinzy.proxyplayer.server.RemoteServer;
+import com.xinzy.proxyplayer.server.Server;
 
 import java.io.IOException;
 

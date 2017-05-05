@@ -1,4 +1,4 @@
-package com.xinzy.proxyplayer.player.server;
+package com.xinzy.proxyplayer.server;
 
 import android.util.Log;
 

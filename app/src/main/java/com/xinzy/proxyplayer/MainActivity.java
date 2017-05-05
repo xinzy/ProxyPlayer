@@ -12,8 +12,8 @@ import android.widget.TextView;
 import com.xinzy.proxyplayer.player.InternalMediaPlayer;
 import com.xinzy.proxyplayer.player.Player;
 import com.xinzy.proxyplayer.player.PlayerImpl;
-import com.xinzy.proxyplayer.player.server.LocalServer;
-import com.xinzy.proxyplayer.player.server.Server;
+import com.xinzy.proxyplayer.server.LocalServer;
+import com.xinzy.proxyplayer.server.Server;
 
 import java.io.File;
 import java.io.FileOutputStream;
