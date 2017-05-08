@@ -638,4 +638,8 @@ public abstract class NanoHTTPD {
     public final boolean wasStarted() {
         return this.myServerSocket != null && this.myThread != null;
     }
+
+    public int getPort() {
+        return myPort;
+    }
 }

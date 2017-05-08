@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Locale;
 
 /**
  * Created by Xinzy on 2017-05-04.
@@ -32,22 +33,22 @@ public class LocalServer extends Server
             return super.serve(session);
         }
 
-        long startPosition = range(session);
         long contentLength = file.length();
+        long startPosition = range(session, contentLength);
 
         try
         {
             FileInputStream fis = new FileInputStream(file);
             if (startPosition > 0)
             {
-                fis.skip(startPosition);
+                startPosition = fis.skip(startPosition);
             }
 
             RandomAccessFile raf = new RandomAccessFile(file, "r");
             raf.seek(startPosition);
 
             Response response = Response.newChunkedResponse(Status.OK, NanoHTTPD.getMimeTypeForFile(mUri), fis);
-            String contentRange = String.format(CONTENT_RANGE_FORMAT, startPosition, contentLength, contentLength - startPosition);
+            String contentRange = String.format(Locale.getDefault(), CONTENT_RANGE_FORMAT, startPosition, contentLength, contentLength - startPosition);
             response.addHeader("Content-Range", contentRange);
 
             return response;

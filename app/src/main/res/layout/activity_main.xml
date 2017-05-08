@@ -72,5 +72,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="测试本地"/>
+        <Button
+            android:id="@+id/testLocalMp3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="测试本地Range"/>
+        <Button
+            android:id="@+id/testRemoteMp3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="测试远程Range"/>
     </LinearLayout>
 </LinearLayout>

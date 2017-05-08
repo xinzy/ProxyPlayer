@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Map;
 
+import okhttp3.Headers;
+
 /**
  * Created by Xinzy on 2017-05-04.
  */
@@ -30,8 +32,8 @@ public abstract class Server extends NanoHTTPD implements IServer
     @Override
     public void startServer(String uri)
     {
-        v(TAG, "startServer");
         mUri = uri;
+        v(TAG, "startServer: uri = " + uri + "; server port = " + getPort());
         try
         {
             start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
@@ -49,7 +51,7 @@ public abstract class Server extends NanoHTTPD implements IServer
         stop();
     }
 
-    protected long range(IHTTPSession session)
+    protected long range(IHTTPSession session, long max)
     {
         long startPosition = 0;
         Map<String, String> headers = session.getHeaders();
@@ -66,11 +68,37 @@ public abstract class Server extends NanoHTTPD implements IServer
                 break;
             }
         }
-        return startPosition;
+        return startPosition >= max ? 0 : startPosition;
+    }
+
+    void logHeader(Headers headers)
+    {
+        StringBuffer sb = new StringBuffer("Remote header: ");
+        for (String s : headers.names())
+        {
+            sb.append(s).append(':').append(headers.get(s)).append("\n");
+        }
+        v(TAG, sb.toString());
+    }
+
+    void logHeader(IHTTPSession session)
+    {
+        Map<String, String> headers = session.getHeaders();
+        StringBuffer sb = new StringBuffer("Server header: ");
+        for (String s : headers.keySet())
+        {
+            sb.append(s).append(':').append(headers.get(s)).append("\n");
+        }
+        e(TAG, sb.toString());
     }
 
 
 
+
+
+    ////////////////////////////////////////////////
+    // Debug
+    ////////////////////////////////////////////////
 
     protected void v(String tag, String msg)
     {
@@ -115,19 +143,16 @@ public abstract class Server extends NanoHTTPD implements IServer
 
 
 
+
     public static String getAddress(int port)
     {
         return URL.replace("{port}", String.valueOf(port));
     }
 
+    private static int port = 10000;
     public static int getAvailablePort()
     {
-        // TODO 判断端口占用
-        int port = 10000;
-//        while (!isPortAvailable(port ++))
-//        {
-//        }
-        return port;
+        return port ++;
     }
 
     private static boolean isPortAvailable(int port)
